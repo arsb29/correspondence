@@ -1,0 +1,45 @@
+.page-main {
+    padding: 100px 0;
+}
+
+.btn-primary {
+    background-color: #0BA5E9;
+    border-color: #0BA5E9;
+}
+
+.badge {
+    line-height: initial;
+}
+
+.message_reply {
+    display: inline-block;
+    margin-left: 112px;
+    color: #C4C4C4;
+}
+
+.message_reply:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.container-small,
+.chatActions {
+    max-width: 570px;
+    margin: 0 auto;
+}
+
+.chatForm > div:first-child {
+    margin-top: 10px;
+}
+
+.chatForm > div:last-child {
+    margin-top: 15px;
+}
+
+#form_blockquote {
+    cursor: not-allowed;
+}
+
+blockquote a {
+    text-decoration: none;
+}

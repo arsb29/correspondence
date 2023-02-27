@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{title}}
+{% endblock %}
+{% block items %}
+    {% if isLogin %}
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/">Переписки</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/signout">Выйти</a>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Войти</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/signup">Регистрация</a>
+        </li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <section class="chat-section">
+        <div class="chat-section__wrapper">
+            <h2 class="chat-section__title">{{ title }}</h2>
+            <div class="chat-section__feed">
+                {% for message in messages %}
+                    {% if message.type == "message" %}
+                        <div class="chat-section__message">
+                           {% if message.outcoming %}
+                            <div class="message message_outcoming">
+                            {% else %}
+                            <div class="message">
+                            {% endif %}
+                            <a class="message__avatar" href="">
+                                {% if message.avatar_file_id %}
+                                    <img alt="" src="/file/{{ message.avatar_file_id }}">
+                                {% else %}
+                                    <img alt="" src="{{ app.router.static.url_for(filename='images/avatar.png') }}">
+                                {% endif %}
+                            </a>
+                            <div class="message__body">
+                                <div class="message__header">
+                                    <div class="message__author">
+                                        <a class="message__author-name js-name" href="#">{{ message.name }} {{ message.lastName }}</a>
+                                    </div>
+                                </div>
+                                <div class="message__content">
+                                    {% if message.reply_text %}
+                                    <blockquote class="message__quote">{{ message.reply_text|safe }}</blockquote>
+                                    {% endif %}
+                                    <p>{{ message.text|safe }}</p>
+                                </div>
+                                <div class="message__footer">
+                                    {% if message.document_id %}
+                                        <a class="message__doc-link" href="/file/{{ message.document_id }}">
+                                            <span class="message__doc-icon">
+                                                <img alt="" height="28" src="{{ app.router.static.url_for(filename='images/doc.svg') }}" width="22">
+                                            </span>
+                                            <span class="message__doc-label">Оригинал документа</span>
+                                        </a>
+                                    {% endif %}
+                                    <div class="message__previews">
+                                        {% for photo_id in message.photos %}
+                                            <a class="message__preview js-gallery-slide" data-lightbox="gallery{{ message.message_id }}" href="/file/{{ photo_id }}">
+                                                <img alt="" width="25" height="25" src="/file/{{ photo_id }}">
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="message__date">{{ message.created_date }}</div>
+                                </div>
+                            </div>
+                        {% if message.outcoming %}
+                        </div>
+                        {% else %}
+                        </div>
+                       {% endif %}
+                           {% if is_chat_owner %}
+                            <div class="message_reply" data-id="{{ message.message_id }}">Ответить</div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="chat-section__notify">
+                            <div class="notify">
+                                <p>{{ message.text|safe }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% if is_chat_owner %}
+        <div class="chatActions">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Сообщение</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Участники</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add" type="button" role="tab" aria-controls="profile" aria-selected="false">Добавление участников</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <form class="chatForm" enctype="multipart/form-data" method="post">
+                        <div class="col">
+                            <div><blockquote class="message__quote" id="form_blockquote" data-id=""></blockquote></div>
+                            <textarea name="message" class="form-control form-control-sm" id="exampleFormControlTextarea1" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="formFile" class="form-label">Оригинал документа</label>
+                                <input name="document" class="form-control form-control-sm" type="file" id="formFile" accept=".pdf,.docx,.jpg,.jpeg,.png" placeholder="sfdf">
+                            </div>
+                            <div class="col">
+                                <label for="formFileMultiple" class="form-label">Фотографии</label>
+                                <input name="photos" class="form-control form-control-sm" type="file" id="formFileMultiple" multiple accept=".jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit" id="submitMessage" class="btn btn-primary btn-sm">
+                                Отправить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <label class="form-label mb-3"></label>
+                    <ol class="list-group list-group-numbered" id="listChatUsers">
+                    </ol>
+                </div>
+                <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+                    <label for="exampleDataList" class="form-label mb-3"></label>
+                    <input class="form-control mb-3" list="datalistOptions" id="exampleDataList" placeholder="Введите логин...">
+                    <datalist id="datalistOptions">
+                    </datalist>
+                    <button type="submit" id="addUser" class="btn btn-primary mb-3">Добавить</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block footer %}
+<script src="{{ app.router.static.url_for(filename='js/chat.js') }}"></script>
+{% endblock %}

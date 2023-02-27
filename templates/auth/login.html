@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}
+    Вход
+{% endblock %}
+{% block items %}
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Войти</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/signup">Регистрация</a>
+    </li>
+{% endblock %}
+{% block content %}
+<form autocomplete="on" method="post" class="container-small">
+    {% for field in form if field.name not in ['submit'] %}
+        <div class="form-floating mb-3">
+            {% if field.errors %}
+                {{ field(class="is-invalid form-control", id=field.description.id, placeholder=field.description.placeholder) }}
+                {% for e in field.errors %}
+                    <div class="invalid-feedback">
+                        {{ e }}
+                    </div>
+                {% endfor %}
+
+            {% else %}
+                {{ field(class="form-control", id=field.description.id, placeholder=field.description.placeholder) }}
+            {% endif %}
+            {{ field.label(for="field") }}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Войти</button>
+</form>
+{% endblock %}
+{% block footer %}
+{% endblock %}

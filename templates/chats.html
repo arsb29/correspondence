@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}
+    Переписки
+{% endblock %}
+{% block navButtons %}
+    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Создать переписку
+    </button>
+{% endblock %}
+{% block items %}
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="/">Переписки</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/signout">Выйти</a>
+    </li>
+{% endblock %}
+{% block content %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <form autocomplete="on" method="post">
+      <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Создание переписки</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {% for field in form if field.name not in ['submit'] %}
+                <div class="form-floating mb-3">
+                    {% if field.errors %}
+                        {{ field(class="is-invalid form-control", id=field.description.id, placeholder=field.description.placeholder) }}
+                        {% for e in field.errors %}
+                            <div class="invalid-feedback">
+                                {{ e }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {{ field(class="form-control", id=field.description.id, placeholder=field.description.placeholder) }}
+                    {% endif %}
+                    {{ field.label(for="field") }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Создать</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  </div>
+    <div class="list-group">
+        {% for chat in chats %}
+            <a href="/chat/{{ chat.chat_id }}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ chat.title }}</h5>
+                    <small class="badge bg-primary rounded-pill">{{ chat.status }}</small>
+                </div>
+                <p class="mb-1">{{ chat.description }}</p>
+                <small class="text-muted">Создано: {{ chat.created_date }}</small>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block footer %}
+{% endblock %}
